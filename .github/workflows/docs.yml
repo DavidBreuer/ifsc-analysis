@@ -1,5 +1,8 @@
 name: Convert ipynb to html
-on: [push]
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   Explore-GitHub-Actions:
@@ -27,6 +30,11 @@ jobs:
         run: |
           ls ${{ github.workspace }}
           ls docs
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4.3.3
+        with:
+          branch: gh-pages # The branch the action should deploy to.
+          folder: docs # The folder the action should deploy.
       - run: echo "This job's status is ${{ job.status }}."
 
 
