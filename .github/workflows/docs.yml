@@ -22,11 +22,11 @@ jobs:
       - name: Build docker images
         run: docker build -t mycontainer . -f Dockerfile
       - name: Run tests
-        run: docker run -it -v $PWD/docs:/app/docs mycontainer make convert
+        run: docker run -v $PWD/docs:/app/docs mycontainer make convert
       - name: List files in the repository
         run: |
           ls ${{ github.workspace }}
           ls docs
       - run: echo "This job's status is ${{ job.status }}."
-        
+
 
