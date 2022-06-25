@@ -222,7 +222,7 @@ def plot_difficulty(colg, fin, names, scb, levels, template, fwidth, fheight):
                    
     if colg == "Comp":
         tab.index = ['(AVG = %.2f) ' % row.mean() + '% ' + idr for idr, row in tab.iterrows()]
-        print("percentiles (25, 50, 75)", np.nanpercentile(tab.values, [25, 50, 75]))
+        # print("percentiles (25, 50, 75)", np.nanpercentile(tab.values, [25, 50, 75]))
         
     
         
