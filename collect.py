@@ -14,7 +14,7 @@ from selenium.webdriver.support.select import Select
 
 url_page = "https://ifsc.results.info"
 
-years = [str(year) for year in range(2022, 2024)] # 1990 2022
+years = [str(year) for year in range(2022, 2024)] # 1990 2024
 
 events = "Past events"
 leagues = "World Cups and World Championships"
@@ -37,6 +37,8 @@ scs = ["Run1", "Run2", "Run3", "Run4", "Run5"]
 columns = base + scb + scl + scs
 
 back = "window.history.go(-1)"
+
+wait = 2
 
 file = "ifsc.xlsx"
 
@@ -77,7 +79,7 @@ if os.path.isfile(file):
     res = pd.read_excel(file)
 else:
     print("Check directory, no ifsc.xlsx file found!")
-    res = rex
+    exit
     res = pd.DataFrame([], columns=columns)
 
 # %#%#
@@ -85,7 +87,7 @@ else:
 for year in years:
 
     # year
-    driver.implicitly_wait(1)
+    driver.implicitly_wait(wait)
     sels = driver.find_elements_by_class_name('custom-select')
     sels[0].click()
     select = Select(sels[0])

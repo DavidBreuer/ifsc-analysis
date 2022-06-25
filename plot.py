@@ -34,6 +34,12 @@ def extract_html(html_in):
     html_out = html_in.split(tag0)[1].split(tag1)[0]+tag1
     return html_out
 
+def get_group(group, key):
+    # https://stackoverflow.com/a/19819648/5350621
+    if key in group.groups: 
+        return group.get_group(key)
+    return pd.DataFrame()
+
 def nandist(veca, vecb):
     idn = (~np.isnan(veca)) & (~np.isnan(vecb))
     sim = np.nanmean(np.abs(veca[idn]-vecb[idn]))
@@ -57,9 +63,9 @@ def month2number(mon):
     num = str(dct[mon.lower()]).zfill(2)
     return num
 
-def results_2_podiums(fin, dca, base, scb):
+def results_2_podiums(fin):
 
-    groups = fin[base + scb + ["Place"]].groupby(["Name", "Level"], sort=False)
+    groups = fin.groupby(["Name", "Level"], sort=False)
     
     keys = groups.indices.keys()
     
@@ -71,11 +77,12 @@ def results_2_podiums(fin, dca, base, scb):
     for name, level in keys:         
         # print(name, level)
         # info
-        dct[name]["Name"] = name
-        dct[name]["Active"] = dca.loc[name, "Active"]
-        dct[name]["Gender"] = dca.loc[name, "Gender"]
-        # comp
         group = groups.get_group((name, level))
+        dct[name]["Name"] = name
+        dct[name]["Active"] = group["Active"].iloc[0]
+        dct[name]["Gender"] = group["Gender"].iloc[0]
+        # comp
+        
         dct[name]["#" + level] = len(group)
         dct[name]["%" + level] = 100.0 * dct[name]["#" + level] / dct[name]["#Q"]            
         # podium
@@ -125,18 +132,18 @@ def networkx_2_plotly(graph, pos, pod, template, fwidth, fheight, vis=False):
         edge_y.append(y0)
         edge_y.append(y1)
         # edge_y.append(None)
-        width = (1.0-ew["weight"])
+        width = 100*(1.0-ew["weight"])
         
         n0 = pod.index[e0]
         n1 = pod.index[e1]        
         p0 = pod.pattern[e0]
         p1 = pod.pattern[e1]      
                 
-        text = "<b>Similarity: %.2f</b><br>%s %s<br>%s %s" % (width, p0, n0, p1, n1)
+        text = "<b>%Similarity: %.2f</b><br>%s %s<br>%s %s" % (width, p0, n0, p1, n1)
         
         edge_trace += [go.Scatter(
             x=edge_x, y=edge_y,
-            line=dict(width=4*width, color='#888'),
+            line=dict(width=4*0.01*width, color='#888'),
             mode='lines',
             visible=vis)]
         edge_trace += [go.Scatter(
@@ -170,7 +177,7 @@ def networkx_2_plotly(graph, pos, pod, template, fwidth, fheight, vis=False):
             colorbar=dict(
                 thickness=25,
                 outlinewidth=0,
-                title='#Podiums',
+                title='#P',
                 #xanchor='left',
                 #titleside='right'
             ),
@@ -182,7 +189,7 @@ def networkx_2_plotly(graph, pos, pod, template, fwidth, fheight, vis=False):
                         titlefont_size=16,
                         showlegend=False,
                         hovermode='closest',
-                        hoverlabel=dict(font=dict(family='monospace')),
+                        hoverlabel=dict(font=dict(family='monospace', size=4)),
                         template=template,
                         xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
                         yaxis=dict(showgrid=False, zeroline=False, showticklabels=False)
@@ -212,9 +219,12 @@ def plot_difficulty(colg, fin, names, scb, levels, template, fwidth, fheight):
         tot = np.nansum(~sub.isna())
         top = np.nansum(~sub.replace(np.inf, np.nan).isna())    
         tab.loc[idl, idc] = 100.0*top/tot
-           
+                   
     if colg == "Comp":
         tab.index = ['(AVG = %.2f) ' % row.mean() + '% ' + idr for idr, row in tab.iterrows()]
+        print("percentiles (25, 50, 75)", np.nanpercentile(tab.values, [25, 50, 75]))
+        
+    
         
     fig = px.imshow(tab,
                     template=template,
