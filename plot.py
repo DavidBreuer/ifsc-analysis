@@ -139,7 +139,7 @@ def networkx_2_plotly(graph, pos, pod, template, fwidth, fheight, vis=False):
         p0 = pod.pattern[e0]
         p1 = pod.pattern[e1]      
                 
-        text = "<b>%Similarity: %.2f</b><br>%s %s<br>%s %s" % (width, p0, n0, p1, n1)
+        text = "<b>%%Similarity: %.2f</b><br>%s %s<br>%s %s" % (width, p0, n0, p1, n1)
         
         edge_trace += [go.Scatter(
             x=edge_x, y=edge_y,
