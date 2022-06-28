@@ -79,7 +79,7 @@ if os.path.isfile(file):
     res = pd.read_excel(file)
 else:
     print("Check directory, no ifsc.xlsx file found!")
-    exit
+    res = rex
     res = pd.DataFrame([], columns=columns)
 
 # %#%#
